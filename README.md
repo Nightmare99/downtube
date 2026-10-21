@@ -17,24 +17,36 @@ dtube 'https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID'
 
 ## Quick start
 
-Install [Rust](https://rustup.rs/) and the download dependencies. On macOS with Homebrew:
+### Linux and macOS
+
+Install the latest release, including both command names, without Rust or `sudo`:
+
+```sh
+curl -fsSL https://github.com/Nightmare99/downtube/releases/latest/download/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+dtube --help
+```
+
+Add `~/.local/bin` to your shell profile's `PATH` if it is not already there. The installer selects your operating system and CPU, verifies the archive's SHA-256 checksum, and installs into `~/.local/bin`.
+
+### Windows (PowerShell)
+
+```powershell
+irm https://github.com/Nightmare99/downtube/releases/latest/download/install.ps1 | iex
+dtube --help
+```
+
+The Windows installer verifies the checksum, installs into `%LOCALAPPDATA%\Programs\downtube\bin`, and adds that directory to your user and current-session `PATH`. Administrator access is not required.
+
+### Download dependencies
+
+The installers install downtube; downloads additionally need [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation), [FFmpeg](https://ffmpeg.org/download.html) with ffprobe, and [Deno](https://docs.deno.com/runtime/getting_started/installation/) or Node. On macOS:
 
 ```sh
 brew install yt-dlp ffmpeg deno
 ```
 
-Clone the repository and install both commands:
-
-```sh
-git clone https://github.com/Nightmare99/downtube.git
-cd downtube
-cargo install --locked --path .
-dtube --help
-```
-
-Ensure Cargo's binary directory, usually `~/.cargo/bin`, is on your `PATH`.
-
-On Linux or Windows, install [yt-dlp](https://github.com/yt-dlp/yt-dlp#installation), [FFmpeg](https://ffmpeg.org/download.html) with ffprobe, and [Deno](https://docs.deno.com/runtime/getting_started/installation/), then run the same Cargo command. Full YouTube support also needs yt-dlp's EJS component: official standalone builds include it; Python installations should use `yt-dlp[default]`. Node is enabled as a fallback runtime.
+See [Installation](docs/installation.md) for supported platforms, pinned versions, custom directories, dependency setup, upgrades, removal, and building from source. Full YouTube support also needs yt-dlp's EJS component: official standalone builds include it; Python installations should use `yt-dlp[default]`.
 
 ## Use it
 
@@ -71,10 +83,13 @@ Press **Ctrl+C** to stop. Repeat the same command to resume. Failed or unavailab
 
 | Guide | What's inside |
 | --- | --- |
+| [Installation](docs/installation.md) | Binary installers, platforms, dependencies, upgrades, and removal |
 | [Usage reference](docs/usage.md) | Every option, destinations, progress, retries, and exit codes |
 | [Troubleshooting](docs/troubleshooting.md) | Missing tools, YouTube errors, sign-in, and interrupted files |
 | [Contributing](CONTRIBUTING.md) | Local setup, checks, and contribution guidelines |
 | [Architecture](docs/architecture.md) | Rust modules, downloader events, and process lifecycle |
+| [Releasing](docs/releasing.md) | Versions, Git tags, release artifacts, and workflow checks |
+| [Changelog](CHANGELOG.md) | Changes in each version |
 
 ## Development
 

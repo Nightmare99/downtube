@@ -22,12 +22,16 @@ Before submitting a change, run:
 cargo fmt --check
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
+python3 tests/installers.py
+shellcheck install.sh
 cargo build --locked --release --bins
 ```
 
 Unit tests cover URL handling, paths, progress events, and unfinished-file cleanup. CLI integration tests cover both executable names, backend failures, output handling, dependency errors, and Ctrl+C. Integration tests in `tests/cli.rs` are currently Unix-only; the default Music directory integration check runs on macOS and Linux.
 
 The automated suite does not exercise live YouTube extraction or FFmpeg conversion. For changes to download arguments or event templates, also check a real download with content you can access. Confirm the folder name, track order, MP3 encoding and tags, live progress, and behavior on a second run. Include those results when describing the change.
+
+The shell installer tests use Python 3.11+ and mocked HTTPS downloads with real local archives. They cover latest/pinned installs, upgrades, paths with spaces, architecture selection, checksum rejection, and version mismatches. GitHub's Release workflow additionally tests the published installers on all supported operating systems and architectures. See [Releasing](docs/releasing.md) for version bumps and release steps.
 
 ## Making changes
 

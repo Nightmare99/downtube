@@ -1,9 +1,11 @@
 [package]
 name = "downtube"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 description = "YouTube playlists, straight to your music folder."
 license = "MIT"
+repository = "https://github.com/Nightmare99/downtube"
+readme = "README.md"
 default-run = "downtube"
 
 [[bin]]

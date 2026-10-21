@@ -4,7 +4,9 @@
 
 ## `dtube` or `downtube` is not found
 
-Install from the project directory:
+Check the installation directory is on `PATH`: the shell installer defaults to `~/.local/bin`, while the PowerShell installer uses `%LOCALAPPDATA%\Programs\downtube\bin`. Reopen your terminal after changing persistent environment settings. See [Installation](installation.md).
+
+If you prefer a source install, run from the project directory:
 
 ```sh
 cargo install --locked --path .
