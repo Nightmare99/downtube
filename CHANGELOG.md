@@ -2,6 +2,11 @@
 
 Versions follow [Semantic Versioning](https://semver.org/). Git tags use a `v` prefix, and the Cargo manifest and lockfile carry the matching version without the prefix.
 
+## [0.2.1] - 2026-10-21
+
+- Correct PowerShell test fixture state across script scopes, allowing native Windows installer validation.
+- First published binary release; the 0.2.0 candidate was stopped by pre-publication checks.
+
 ## [0.2.0] - 2026-10-21
 
 - Publish native release binaries for Linux, macOS, and Windows on x86-64 and ARM64.

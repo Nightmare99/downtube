@@ -29,9 +29,9 @@ export PATH="$HOME/.local/bin:$PATH"
 For a specific version or a different destination:
 
 ```sh
-curl -fsSL https://github.com/Nightmare99/downtube/releases/download/v0.2.0/install.sh \
+curl -fsSL https://github.com/Nightmare99/downtube/releases/download/v0.2.1/install.sh \
   -o install-downtube.sh
-sh install-downtube.sh --version v0.2.0 --install-dir "$HOME/bin"
+sh install-downtube.sh --version v0.2.1 --install-dir "$HOME/bin"
 rm install-downtube.sh
 ```
 
@@ -50,8 +50,8 @@ The default destination is `%LOCALAPPDATA%\Programs\downtube\bin`. The installer
 For a pinned version, a custom directory, or no `PATH` changes:
 
 ```powershell
-$installer = irm https://github.com/Nightmare99/downtube/releases/download/v0.2.0/install.ps1
-& ([scriptblock]::Create($installer)) -Version v0.2.0 -InstallDir "$env:LOCALAPPDATA\downtube\bin" -NoModifyPath
+$installer = irm https://github.com/Nightmare99/downtube/releases/download/v0.2.1/install.ps1
+& ([scriptblock]::Create($installer)) -Version v0.2.1 -InstallDir "$env:LOCALAPPDATA\downtube\bin" -NoModifyPath
 ```
 
 `DOWNTUBE_VERSION` and `DOWNTUBE_INSTALL_DIR` environment variables also provide defaults. If your machine's execution policy blocks a saved script, the script-block invocation above avoids changing that policy.
