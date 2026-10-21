@@ -53,7 +53,7 @@ Separate reader threads drain stdout and stderr into a bounded channel. The main
 
 On Unix, the downloader gets its own process group. Cancellation sends SIGINT to that group and escalates to SIGKILL after three seconds. Other platforms use direct child termination. The loop drains remaining output before returning.
 
-`PendingFiles` tracks prospective MP3 paths inside the destination that appear to be new in this run, using existence and creation-time checks. Completed paths are removed from the pending set. On drop, remaining pending MP3s are removed where possible so they are not mistaken for completed downloads on retry. Cleanup is best effort and does not survive forced process termination or a machine crash.
+Before launching the downloader, `PendingFiles` takes a snapshot of existing paths inside the destination, without following symlinks. It tracks prospective MP3 paths absent from that snapshot, conservatively protecting symlinked or unreadable paths. This avoids relying on filesystem timestamp precision. Completed paths are removed from the pending set. On drop, remaining pending MP3s are removed where possible so they are not mistaken for completed downloads on retry. Cleanup is best effort and does not survive forced process termination or a machine crash.
 
 ## Persistence and limits
 

@@ -7,6 +7,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Git tags use a `v` p
 - Publish native release binaries for Linux, macOS, and Windows on x86-64 and ARM64.
 - Add checksum-verifying shell and PowerShell installers with version and destination overrides.
 - Automate release validation, packaging, publishing, and installation smoke checks in GitHub Actions.
+- Fix interruption cleanup on filesystems with coarse timestamps and preserve symlinked destinations.
 - Document binary installation, upgrades, removal, and the release/versioning process.
 
 ## [0.1.0] - 2026-10-21

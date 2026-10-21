@@ -74,16 +74,43 @@ pub fn command(cli: &Cli, output: &Path) -> Command {
 pub struct PendingFiles {
     root: std::path::PathBuf,
     files: std::collections::HashSet<std::path::PathBuf>,
-    started: std::time::SystemTime,
+    existing: std::collections::HashSet<String>,
+    protected: Vec<String>,
 }
 
 impl PendingFiles {
     pub fn new(root: &Path) -> Self {
-        Self {
+        let mut state = Self {
             root: root.to_owned(),
             files: Default::default(),
-            started: std::time::SystemTime::now(),
+            existing: Default::default(),
+            protected: Vec::new(),
+        };
+        // Snapshot before starting the downloader: filesystem timestamps can be
+        // coarser than the interval between launching it and receiving an event.
+        let mut directories = vec![root.to_owned()];
+        while let Some(directory) = directories.pop() {
+            let Ok(entries) = std::fs::read_dir(&directory) else {
+                state.protected.push(path_key(&directory));
+                continue;
+            };
+            for entry in entries {
+                let Ok(entry) = entry else {
+                    state.protected.push(path_key(&directory));
+                    continue;
+                };
+                let path = entry.path();
+                match entry.file_type() {
+                    Ok(kind) if kind.is_symlink() => state.protected.push(path_key(&path)),
+                    Ok(kind) if kind.is_dir() => directories.push(path),
+                    Ok(_) => {
+                        state.existing.insert(path_key(&path));
+                    }
+                    Err(_) => state.protected.push(path_key(&path)),
+                }
+            }
         }
+        state
     }
 
     pub fn observe(&mut self, line: &str) {
@@ -92,12 +119,12 @@ impl PendingFiles {
             && let Some(filename) = data["_filename"].as_str()
         {
             let mp3 = Path::new(filename).with_extension("mp3");
-            // The pipe reader may receive before_dl after FFmpeg has created its
-            // output, so also recognize files created since this run began.
-            let created_this_run = std::fs::metadata(&mp3)
-                .and_then(|metadata| metadata.created())
-                .is_ok_and(|created| created >= self.started);
-            if mp3.starts_with(&self.root) && (!mp3.exists() || created_this_run) {
+            let key = path_key(&mp3);
+            let protected = self
+                .protected
+                .iter()
+                .any(|prefix| key == *prefix || key.starts_with(&format!("{prefix}/")));
+            if mp3.starts_with(&self.root) && !self.existing.contains(&key) && !protected {
                 self.files.insert(mp3);
             }
         } else if let Some(json) = line.strip_prefix(DONE)
@@ -106,6 +133,15 @@ impl PendingFiles {
             self.files.remove(Path::new(&filename));
         }
     }
+}
+
+// Case-folding conservatively protects existing files on case-insensitive
+// filesystems too. Collisions only skip cleanup; they never delete extra files.
+fn path_key(path: &Path) -> String {
+    path.to_string_lossy()
+        .replace('\\', "/")
+        .trim_end_matches('/')
+        .to_lowercase()
 }
 
 impl Drop for PendingFiles {
@@ -150,5 +186,35 @@ mod tests {
         assert!(!partial.exists());
         assert_eq!(std::fs::read_to_string(finished).unwrap(), "finished audio");
         assert_eq!(std::fs::read_to_string(existing).unwrap(), "existing song");
+    }
+
+    #[test]
+    fn cleans_new_mp3_even_when_output_arrives_before_the_track_event() {
+        let temp = tempfile::tempdir().unwrap();
+        let mp3 = temp.path().join("fast.mp3");
+        {
+            let mut pending = PendingFiles::new(temp.path());
+            std::fs::write(&mp3, "partial audio").unwrap();
+            let info = serde_json::json!({"_filename": mp3.with_extension("webm")});
+            pending.observe(&format!("{TRACK}{info}"));
+        }
+        assert!(!mp3.exists());
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn preserves_files_behind_symlinked_directories() {
+        let root = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let mp3 = outside.path().join("existing.mp3");
+        std::fs::write(&mp3, "existing audio").unwrap();
+        let link = root.path().join("linked");
+        std::os::unix::fs::symlink(outside.path(), &link).unwrap();
+        {
+            let mut pending = PendingFiles::new(root.path());
+            let info = serde_json::json!({"_filename": link.join("existing.webm")});
+            pending.observe(&format!("{TRACK}{info}"));
+        }
+        assert!(mp3.exists());
     }
 }
