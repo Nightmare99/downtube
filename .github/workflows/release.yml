@@ -103,13 +103,14 @@ jobs:
           TARGET: ${{ matrix.target }}
         run: |
           suffix=''
-          if [ "$RUNNER_OS" = Windows ]; then suffix='.exe'; fi
+          python_executable=python3
+          if [ "$RUNNER_OS" = Windows ]; then suffix='.exe'; python_executable=python; fi
           for binary in downtube dtube; do
             actual=$("target/$TARGET/release/$binary$suffix" --version)
             test "$actual" = "downtube ${RELEASE_TAG#v}"
             "target/$TARGET/release/$binary$suffix" --help
           done
-          python scripts/package-release.py --target "$TARGET"
+          "$python_executable" scripts/package-release.py --target "$TARGET"
       - name: Test PowerShell installer before publishing
         if: runner.os == 'Windows'
         shell: pwsh

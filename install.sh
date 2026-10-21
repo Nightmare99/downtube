@@ -75,7 +75,9 @@ main() {
     fi
     [ "$actual" = "$expected" ] || fail 'checksum mismatch; nothing was installed'
     tar -xzf "$scratch/$asset" -C "$scratch" downtube dtube
-    [ -f "$scratch/downtube" ] && [ -f "$scratch/dtube" ] || fail 'release is missing binaries'
+    if [ ! -f "$scratch/downtube" ] || [ ! -f "$scratch/dtube" ]; then
+        fail 'release is missing binaries'
+    fi
     chmod 755 "$scratch/downtube" "$scratch/dtube"
     reported=$("$scratch/downtube" --version) || fail 'downloaded binary cannot run on this system'
     [ "$reported" = "downtube ${version#v}" ] || fail 'binary version does not match the release'
