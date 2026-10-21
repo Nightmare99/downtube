@@ -1,0 +1,35 @@
+[package]
+name = "downtube"
+version = "0.1.0"
+edition = "2024"
+description = "YouTube playlists, straight to your music folder."
+license = "MIT"
+default-run = "downtube"
+
+[[bin]]
+name = "downtube"
+path = "src/main.rs"
+
+[[bin]]
+name = "dtube"
+path = "src/bin/dtube.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.6", features = ["derive"] }
+console = "0.16"
+ctrlc = "3.5"
+dirs = "6"
+indicatif = "0.18"
+serde_json = "1"
+url = "2.5"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+lto = "thin"
+strip = true

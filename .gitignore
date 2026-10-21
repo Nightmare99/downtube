@@ -1,0 +1,43 @@
+# Rust builds and generated distribution files
+/target/
+/build/
+/dist/
+
+# Local caches, virtual environments, and temporary work
+/.cache/
+/.venv/
+/venv/
+/tmp/
+/temp/
+__pycache__/
+*.py[cod]
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.log
+*.swp
+*.swo
+*~
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Downloaded media and resume data
+*.mp3
+*.m4a
+*.aac
+*.opus
+*.webm
+*.mp4
+*.mkv
+*.part
+*.part-*
+*.ytdl
